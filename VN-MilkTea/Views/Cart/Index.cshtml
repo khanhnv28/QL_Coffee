@@ -1,0 +1,168 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<br />
+<h2>@ViewBag.Cart</h2>
+@model  VN_MilkTea.Models.Cart
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Hình ảnh</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Tổng tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr id="product-@item.ProductId">
+                <td>@item.ProductName</td>
+                <td><img src=" data:image;base64,@item.Image" alt="@item.ProductName" style="max-width:200px" /> </td>
+                <td>
+                    <input type="number" class="quantityItem" id="quantity_@item.ProductId" value="@item.Quantity" min="1" onchange="updateTotalPrice(@item.ProductId)">
+                </td>
+                <td id="price_@item.ProductId">@item.Price.ToString("#,0 VNĐ")</td>
+                <td class="totalPrice" id="totalPrice_@item.ProductId">@item.TotalPrice.ToString("#,0 VNĐ")</td>
+
+                <td class="text-right">
+                    <input type="hidden" value="@item.ProductId" id="productid" />
+                    <a data-original-title="Save to Wishlist" title="" href="#" class="btn btn-light btn-add-to-wishlist" data-product-id="@item.ProductId" data-toggle="tooltip">
+                        <i class="fa fa-heart"></i>
+                    </a>
+                    <a href="" class="removecart" data-product-id="@item.ProductId"> Remove</a>
+                </td>
+                <td><input type="hidden" class="quantity" value="@item.Quantity" /></td>
+                <td><input type="hidden" class="price" value="@item.Price" /></td>
+
+            </tr>
+        }
+    </tbody>
+    <p class="text-right cartTotal">Tổng cộng: @string.Format("{0:0,#}", Model.Items.Sum(item => item.TotalPrice)) VNĐ</p>
+</table>
+<div class="text-while" style="right:25px; bottom:25px">
+    <a class="btn btn-success" id="checkoutButton">
+        Thanh Toán
+    </a>
+</div>
+
+
+
+
+<script type="text/javascript">
+    $(function () {
+        $(".removecart").click(function () {
+            var productId = $(this).data("product-id");
+
+            $.ajax({
+                type: "POST",
+                url: "/Cart/RemoveCartItem",
+                data: { productId: productId },
+                dataType: "json",
+                success: function () {
+                    $('#CartCount').text(@Session["count"] - 1);
+                    $("#product-" + productId).remove();
+                },
+                error: function () {
+                    alert("Lỗi trong khi thêm vào giỏ hàng! Kiểm tra đăng nập");
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+<!-- Ajax Add to wishlist -->
+<!-- Trong View -->
+<script>
+    $(document).ready(function () {
+        $(".btn-add-to-wishlist").click(function () {
+            var productId = $(this).data("product-id");
+
+            $.ajax({
+                type: "POST",
+                url: "/Cart/AddToWishlist",
+                data: { productId: productId },
+                dataType: "json",
+                success: function (result) {
+                    if (result.success) {
+                        
+                        alert("Thêm vào danh sách yêu thích thành công!");
+                    } else {
+                        alert("Thêm vào danh sách yêu thích thất bại: " + result.message);
+                    }
+                },
+                error: function () {
+                    alert("Lỗi trong khi thêm vào danh sách yêu thích.");
+                }
+            });
+        });
+    });
+
+</script>
+
+
+
+<script>
+
+    //const productItem = $('.quantityItem').val();
+    //const data = JSON.parse(localStorage.getItem('product-info'));
+    //if (($("#quantity_" + productId).val() == data.productID) {
+    //    $("#quantity_" + productId).val(data.quantity);
+    //}
+
+
+    function updateTotalPrice(productId) {
+
+            var newQuantity = parseInt($("#quantity_" + productId).val());
+            var price = parseFloat($("#price_" + productId).text().replace(/[^0-9.-]+/g, ""));
+            var currentTotalPrice = parseFloat($("#totalPrice_" + productId).text().replace(/[^0-9.-]+/g, ""));
+            var newTotalPrice = price * newQuantity;
+            $("#totalPrice_" + productId).text(newTotalPrice.toString() + " VNĐ");
+            updateCartTotal();
+
+    }
+
+
+    function updateCartTotal() {
+        // get item from local storage
+
+        var totalQuantity = 0;
+        var totalPrice = 0;
+
+        $(".totalPrice").each(function () {
+            var price = parseFloat($(this).text().replace(/[^0-9.-]+/g, ""));
+            var quantity = parseInt($(this).closest("tr").find(".quantity").val());
+
+            totalPrice += price;
+            totalQuantity += quantity;
+        });
+
+        let convertTotalPrice = convertPrice(`${totalPrice}`);
+        $(".cartTotal").text("Tổng cộng: " + convertTotalPrice);
+
+        // Lưu các thông tin này trong các input ẩn
+        $("#totalQuantity").val(totalQuantity);
+        $("#totalPrice").val(totalPrice);
+
+    }
+    $("#checkoutButton").click(function () {
+    // Gửi yêu cầu thanh toán đến server (có thể sử dụng Ajax)
+    // Sau khi hoàn thành thanh toán, chuyển đến trang thanh toán (Checkout)
+        window.location.href = "@Url.Action("Checkout", "Cart")";
+    });
+
+    function convertPrice(priceString) {
+        priceString = priceString.replace(" VNĐ", "");
+        var price = parseInt(priceString, 10);
+        var formattedPrice = price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        return formattedPrice + " VNĐ";
+    }
+
+</script>
+

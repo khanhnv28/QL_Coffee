@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewBag.Title = "AddToWishlist";
+    Layout = "~/Views/Shared/_LayoutPage3.cshtml";
+}
+
+
+<h3>Danh sách sản phẩm yêu thích</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Hình ảnh</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Tổng tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr id="product-@item.ProductId">
+                <td>@item.ProductName</td>
+                <td><img src=" data:image;base64,@item.Image" alt="@item.ProductName" style="max-width:200px" /> </td>
+                <td>
+                    <input type="number" class="quantityItem" id="quantity_@item.ProductId" value="@item.Quantity" min="1" onchange="updateTotalPrice(@item.ProductId)">
+                </td>
+                <td id="price_@item.ProductId">@item.Price.ToString("#,0 VNĐ")</td>
+                <td class="totalPrice" id="totalPrice_@item.ProductId">@item.TotalPrice.ToString("#,0 VNĐ")</td>
+
+                <td class="text-right">
+                    <input type="hidden" value="@item.ProductId" id="productid" />
+
+
+                </td>
+                <td><input type="hidden" class="quantity" value="@item.Quantity" /></td>
+                <td><input type="hidden" class="price" value="@item.Price" /></td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Thêm thư viện jQuery và file JavaScript cần thiết -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="path/to/your/wishlist-script.js"></script>
+

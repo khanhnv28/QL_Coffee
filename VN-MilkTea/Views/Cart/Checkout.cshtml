@@ -1,0 +1,34 @@
+﻿@model  VN_MilkTea.Models.Checkout
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "~/Views/Shared/_LayoutPage1.cshtml";
+}
+
+<h2>Xác nhận đơn hàng</h2>
+<p>Cảm ơn bạn đã thanh toán!</p>
+<h3>Thông tin đơn hàng:</h3>
+<p><strong>Mã khách hàng:</strong> @Model.Order.UserId</p>
+<p><strong>Mã đơn hàng:</strong> @Model.Order.OrderId</p>
+<p><strong>Ngày đặt hàng:</strong> @Model.Order.OrderDate</p>
+<p><strong>Tổng số tiền:</strong> @string.Format("{0:0,#}", Model.Order.TotalAmount) VNĐ</p>
+
+
+<h3>Danh sách sản phẩm trong đơn hàng:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Hình ảnh</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>@product.ProductName</td>
+                <td><img src=" data:image;base64,@product.Image" alt="Alternate Text" /></td>
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -1,0 +1,36 @@
+﻿@model VN_MilkTea.ViewModel.Login
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LayoutPage2.cshtml";
+}
+
+@section dangnhap{
+        <section id="form form-login">
+            <!--form-->
+            <div class="container">
+                <div class="row mx-auto">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-6 col-sm-offset-1">
+                        <div class="login-form">
+                            <!--login form-->
+                            <h2>Đăng nhập vào tài khoản của bạn</h2>
+                            <form action="/account/login" method="post">
+                                <input type="text" name="UserName" placeholder="Tên đăng nhập" />
+                                <input type="password" name="Password" placeholder="Mật khẩu " />
+                                <span>
+                                    <input type="checkbox" class="checkbox">
+                                    Giữ đăng nhập!
+                                </span>
+                                <button type="submit" class="btn btn-default">Đăng nhập</button>
+                                <div class="icon">
+                                    <a href="@Url.Action("Register", "Account")">Đăng ký - Không có tài khoản?</a>
+                                </div>
+                            </form>
+                        </div><!--/login form-->
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+

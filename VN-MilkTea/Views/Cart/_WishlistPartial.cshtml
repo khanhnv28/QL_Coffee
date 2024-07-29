@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewBag.Title = "Wishlist";
+    Layout = "~/Views/Shared/_LayoutPage3.cshtml";
+}
+
+@model List<VN_MilkTea.Models.WishlistItem>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Hình ảnh</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr id="product-@item.ProductId">
+                <td>@item.ProductName</td>
+                <td><img src=" data:image;base64,@item.Image" alt="@item.ProductName" style="max-width:200px" /> </td>
+                <td id="quantity_@item.ProductId">@item.Quantity</td>
+                <td id="price_@item.ProductId">@item.Price.ToString("#,0 VNĐ")</td>
+
+                <td class="text-right">
+                    <input type="hidden" value="@item.ProductId" id="productid" />
+                    <a href="" class="remove-from-wishlist" data-product-id="@item.ProductId">Remove</a>
+                </td>
+                <td><input type="hidden" class="quantity" value="@item.Quantity" /></td>
+                <td><input type="hidden" class="price" value="@item.Price" /></td>
+
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+        <script type="text/javascript">
+            $(function() {
+                // Xử lý sự kiện khi người dùng xóa sản phẩm khỏi danh sách yêu thích
+                $(".remove-from-wishlist").click(function() {
+                    var productId = $(this).data("product-id");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Cart/RemoveFromWishlist",
+                        data: { productId: productId },
+                        dataType: "json",
+                        success: function () {
+
+                            $("#product-" + productId).remove();
+                        },
+                        error: function () {
+                            alert("Lỗi khi xóa sản phẩm khỏi danh sách yêu thích");
+                        }
+
+                    });
+
+                    return false;
+                });
+            });
+        </script>
+
+
